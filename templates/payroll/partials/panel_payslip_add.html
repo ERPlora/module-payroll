@@ -1,0 +1,84 @@
+{% load djicons i18n %}
+
+<div class="side-sheet-header">
+    <h3 class="sheet-title">{% trans "Add Payslip" %}</h3>
+    <button class="sheet-close" @click="closePanel()">{% icon "close-outline" %}</button>
+</div>
+
+<div class="side-sheet-content">
+    <form id="add-payslip-form"
+          hx-post="{% url 'payroll:payslip_add' %}"
+          hx-target="#datatable-body"
+          hx-swap="innerHTML"
+          @htmx:after-request="closePanel()"
+          class="flex flex-col gap-4 p-6">
+        {% csrf_token %}
+
+        {% if error %}
+        <div class="callout callout-error">
+            <div class="callout-content"><span class="callout-text">{{ error }}</span></div>
+        </div>
+        {% endif %}
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Employee Id" %}</label>
+            <input type="text" name="employee_id" class="input input-sm w-full" placeholder="{% trans 'Employee Id' %}">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Employee Name" %}</label>
+            <input type="text" name="employee_name" class="input input-sm w-full" placeholder="{% trans 'Employee Name' %}">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Period Start" %}</label>
+            <input type="date" name="period_start" class="input input-sm w-full">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Period End" %}</label>
+            <input type="date" name="period_end" class="input input-sm w-full">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Gross Salary" %}</label>
+            <input type="number" name="gross_salary" class="input input-sm w-full" step="0.01" placeholder="0">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Deductions" %}</label>
+            <input type="number" name="deductions" class="input input-sm w-full" step="0.01" placeholder="0">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Net Salary" %}</label>
+            <input type="number" name="net_salary" class="input input-sm w-full" step="0.01" placeholder="0">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Status" %}</label>
+            <select name="status" class="select select-sm w-full">
+                <option value="">{% trans "Select..." %}</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Paid Date" %}</label>
+            <input type="date" name="paid_date" class="input input-sm w-full">
+        </div>
+
+        <div>
+            <label class="text-sm font-medium mb-1 block">{% trans "Notes" %}</label>
+            <textarea name="notes" class="textarea textarea-sm w-full" rows="3"></textarea>
+        </div>
+    </form>
+</div>
+
+<div class="side-sheet-footer">
+    <div class="flex justify-end gap-2">
+        <button type="button" class="btn btn-ghost btn-sm" @click="closePanel()">{% trans "Cancel" %}</button>
+        <button type="submit" form="add-payslip-form" class="btn btn-sm color-primary">
+            {% icon "add-outline" %} {% trans "Add" %}
+        </button>
+    </div>
+</div>
