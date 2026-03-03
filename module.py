@@ -29,3 +29,16 @@ PERMISSIONS = [
 'payroll.delete_payslip',
 'payroll.manage_settings',
 ]
+
+ROLE_PERMISSIONS = {
+    "admin": ["*"],
+    "manager": [
+        "add_payslip",
+        "change_payslip",
+        "view_payslip",
+    ],
+    "employee": [
+        "add_payslip",
+        "view_payslip",
+    ],
+}
