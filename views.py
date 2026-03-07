@@ -3,6 +3,8 @@ Payroll Module Views
 """
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
+from django.http import HttpResponse
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, render as django_render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -113,6 +115,7 @@ def payslips_list(request):
     }
 
 @login_required
+@htmx_view('payroll/pages/payslip_add.html', 'payroll/partials/payslip_add_content.html')
 def payslip_add(request):
     hub_id = request.session.get('hub_id')
     if request.method == 'POST':
@@ -138,10 +141,13 @@ def payslip_add(request):
         obj.paid_date = paid_date
         obj.notes = notes
         obj.save()
-        return _render_payslips_list(request, hub_id)
-    return django_render(request, 'payroll/partials/panel_payslip_add.html', {})
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse('payroll:payslips_list')
+        return response
+    return {}
 
 @login_required
+@htmx_view('payroll/pages/payslip_edit.html', 'payroll/partials/payslip_edit_content.html')
 def payslip_edit(request, pk):
     hub_id = request.session.get('hub_id')
     obj = get_object_or_404(Payslip, pk=pk, hub_id=hub_id, is_deleted=False)
@@ -158,7 +164,7 @@ def payslip_edit(request, pk):
         obj.notes = request.POST.get('notes', '').strip()
         obj.save()
         return _render_payslips_list(request, hub_id)
-    return django_render(request, 'payroll/partials/panel_payslip_edit.html', {'obj': obj})
+    return {'obj': obj}
 
 @login_required
 @require_POST
