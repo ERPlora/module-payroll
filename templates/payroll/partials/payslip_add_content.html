@@ -1,4 +1,4 @@
-{% load djicons i18n %}
+{% load djicons i18n chooser %}
 <div data-back-url="{% url 'payroll:payslips_list' %}" hidden></div>
 
 <div class="p-4">
@@ -26,18 +26,15 @@
         {% endif %}
     <!-- Form -->
     <form id="add-payslip-form"
-          hx-post="{% url 'payroll:payslip_add' %}">
+          hx-post="{% url 'payroll:payslip_add' %}"
+          @chooser-change.window="if ($event.detail.name === 'employee_id') { $el.querySelector('[name=employee_name]').value = $event.detail.items.length ? $event.detail.items[0].label : '' }">
         {% csrf_token %}
         <div class="card mb-4">
             <div class="card-body flex flex-col gap-4">
                 <div>
-                <label class="text-sm font-medium mb-1 block">{% trans "Employee Id" %}</label>
-                <input type="text" name="employee_id" class="input input-sm w-full" placeholder="{% trans 'Employee Id' %}">
-                </div>
-
-                <div>
-                <label class="text-sm font-medium mb-1 block">{% trans "Employee Name" %}</label>
-                <input type="text" name="employee_name" class="input input-sm w-full" placeholder="{% trans 'Employee Name' %}">
+                <label class="text-sm font-medium mb-1 block">{% trans "Employee" %}</label>
+                {% chooser "accounts.localuser" name="employee_id" %}
+                <input type="hidden" name="employee_name" value="">
                 </div>
 
                 <div>
@@ -68,7 +65,10 @@
                 <div>
                 <label class="text-sm font-medium mb-1 block">{% trans "Status" %}</label>
                 <select name="status" class="select select-sm w-full">
-                <option value="">{% trans "Select..." %}</option>
+                <option value="draft" selected>{% trans "Draft" %}</option>
+                <option value="confirmed">{% trans "Confirmed" %}</option>
+                <option value="paid">{% trans "Paid" %}</option>
+                <option value="cancelled">{% trans "Cancelled" %}</option>
                 </select>
                 </div>
 
