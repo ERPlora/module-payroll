@@ -137,3 +137,65 @@ class GetPayrollSummary(AssistantTool):
             "count": totals['count'],
             "by_status": by_status,
         }
+
+
+@register_tool
+class UpdatePayrollRun(AssistantTool):
+    name = "update_payroll_run"
+    description = "Update a payslip's status (confirm, pay, or cancel)."
+    module_id = "payroll"
+    required_permission = "payroll.change_payslip"
+    requires_confirmation = True
+    parameters = {
+        "type": "object",
+        "properties": {
+            "payslip_id": {"type": "string"},
+            "status": {"type": "string", "description": "confirmed, paid, cancelled"},
+        },
+        "required": ["payslip_id", "status"],
+        "additionalProperties": False,
+    }
+
+    def execute(self, args, request):
+        from django.utils import timezone
+        from payroll.models import Payslip
+        try:
+            p = Payslip.objects.get(id=args['payslip_id'])
+        except Payslip.DoesNotExist:
+            return {"error": "Payslip not found"}
+        new_status = args['status']
+        if new_status not in ('confirmed', 'paid', 'cancelled'):
+            return {"error": "Status must be confirmed, paid, or cancelled"}
+        p.status = new_status
+        update_fields = ['status', 'updated_at']
+        if new_status == 'paid':
+            p.paid_date = timezone.now().date()
+            update_fields.append('paid_date')
+        p.save(update_fields=update_fields)
+        return {"id": str(p.id), "status": p.status, "updated": True}
+
+
+@register_tool
+class DeletePayrollRun(AssistantTool):
+    name = "delete_payroll_run"
+    description = "Delete a payslip (only allowed when status is draft)."
+    module_id = "payroll"
+    required_permission = "payroll.delete_payslip"
+    requires_confirmation = True
+    parameters = {
+        "type": "object",
+        "properties": {"payslip_id": {"type": "string"}},
+        "required": ["payslip_id"],
+        "additionalProperties": False,
+    }
+
+    def execute(self, args, request):
+        from payroll.models import Payslip
+        try:
+            p = Payslip.objects.get(id=args['payslip_id'])
+        except Payslip.DoesNotExist:
+            return {"error": "Payslip not found"}
+        if p.status != 'draft':
+            return {"error": f"Cannot delete a payslip with status '{p.status}'. Only draft payslips can be deleted."}
+        p.delete()
+        return {"deleted": True}
