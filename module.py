@@ -2,8 +2,8 @@ from django.utils.translation import gettext_lazy as _
 
 MODULE_ID = 'payroll'
 MODULE_NAME = _('Payroll')
-MODULE_VERSION = '1.0.0'
-MODULE_ICON = 'cash-outline'
+MODULE_VERSION = '1.0.1'
+MODULE_ICON = 'material:account_balance_wallet'
 MODULE_DESCRIPTION = _('Payroll calculation, deductions and payslips')
 MODULE_AUTHOR = 'ERPlora'
 MODULE_CATEGORY = 'hr'
