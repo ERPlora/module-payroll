@@ -43,3 +43,11 @@ ROLE_PERMISSIONS = {
         "view_payslip",
     ],
 }
+
+SCHEDULED_TASKS = [
+    {
+        'task': 'payroll.generate_monthly_payslips',
+        'cron': '0 1 1 * *',
+        'description': 'Generate payslips for all employees',
+    },
+]
