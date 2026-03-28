@@ -7,6 +7,7 @@ MODULE_ICON = 'material:account_balance_wallet'
 MODULE_DESCRIPTION = _('Payroll calculation, deductions and payslips')
 MODULE_AUTHOR = 'ERPlora'
 MODULE_CATEGORY = 'hr'
+HAS_MODELS = True
 
 MENU = {
     'label': _('Payroll'),
